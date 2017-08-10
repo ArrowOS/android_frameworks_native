@@ -53,6 +53,7 @@ cc_library_shared {
     cflags: [
         // TODO(b/23084678): Move inputflinger to its own process and mark it hidden
         //-fvisibility=hidden
+        "-DONEHANDED_SUPPORT",
     ],
 
     export_include_dirs: [
