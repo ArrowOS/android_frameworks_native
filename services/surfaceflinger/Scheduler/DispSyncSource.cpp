@@ -41,7 +41,9 @@ DispSyncSource::DispSyncSource(DispSync* dispSync, nsecs_t phaseOffset,
         mPhaseOffset(phaseOffset),
         mOffsetThresholdForNextVsync(offsetThresholdForNextVsync) {
         mDolphinHandle = dlopen("libdolphin.so", RTLD_NOW);
-        if (mDolphinHandle) {
+        if (!mDolphinHandle) {
+            ALOGW("Unable to open libdolphin.so: %s.", dlerror());
+        } else {
             mDolphinCheck = (bool (*) (const char*))dlsym(mDolphinHandle, "dolphinCheck");
             if (!mDolphinCheck) dlclose(mDolphinHandle);
         }

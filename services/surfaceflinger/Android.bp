@@ -189,6 +189,9 @@ cc_library_shared {
                     "vendor.display.config@1.6",
                     "vendor.display.config@1.7",
                     "vendor.display.config@1.9",
+                    "vendor.display.config@1.12",
+                    "vendor.qti.hardware.display.composer@2.0",
+                    "vendor.qti.hardware.display.composer@2.1",
                 ],
             },
             uses_qcom_um_3_18_family: {
