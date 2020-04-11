@@ -929,6 +929,8 @@ private:
     // matching ownerUid
     void traverseLayersInLayerStack(ui::LayerStack, const int32_t uid, const LayerVector::Visitor&);
 
+    bool canAllocateHwcDisplayIdForVDS(uint64_t usage);
+
     void readPersistentProperties();
 
     size_t getMaxTextureSize() const;
@@ -1112,7 +1114,8 @@ private:
     void enableHalVirtualDisplays(bool);
 
     // Virtual display lifecycle for ID generation and HAL allocation.
-    VirtualDisplayId acquireVirtualDisplay(ui::Size, ui::PixelFormat, ui::LayerStack)
+    VirtualDisplayId acquireVirtualDisplay(ui::Size, ui::PixelFormat, ui::LayerStack,
+                                           bool canAllocateHwcForVDS)
             REQUIRES(mStateLock);
     void releaseVirtualDisplay(VirtualDisplayId);
 
