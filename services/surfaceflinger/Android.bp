@@ -74,9 +74,35 @@ cc_defaults {
     ],
     product_variables: {
         arrow: {
-            qcom_um_soong_namespace: {
+            uses_qcom_um_3_18_family: {
                 cflags: ["-DQCOM_UM_FAMILY"],
-                header_libs: ["//%s:display_intf_headers"],
+                header_libs: [
+                    "//hardware/qcom/display-caf/msm8996:display_intf_headers",
+                ],
+            },
+            uses_qcom_um_4_4_family: {
+                cflags: ["-DQCOM_UM_FAMILY"],
+                header_libs: [
+                    "//hardware/qcom/display-caf/msm8998:display_intf_headers",
+                ],
+            },
+            uses_qcom_um_4_9_family: {
+                cflags: ["-DQCOM_UM_FAMILY"],
+                header_libs: [
+                    "//hardware/qcom/display-caf/sdm845:display_intf_headers",
+                ],
+            },
+            uses_qcom_um_4_14_family: {
+                cflags: ["-DQCOM_UM_FAMILY"],
+                header_libs: [
+                    "//hardware/qcom/display-caf/sm8150:display_intf_headers",
+                ],
+            },
+            uses_qcom_um_4_19_family: {
+                cflags: ["-DQCOM_UM_FAMILY"],
+                header_libs: [
+                    "//hardware/qcom/display-caf/sm8250:display_intf_headers",
+                ],
             },
         },
     },
