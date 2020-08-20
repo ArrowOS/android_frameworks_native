@@ -163,7 +163,11 @@ status_t VirtualDisplaySurface::prepareFrame(CompositionType compositionType) {
 
     if (mCompositionType != COMPOSITION_GLES &&
             (mOutputFormat != mDefaultOutputFormat ||
+#ifdef QCOM_UM_FAMILY
              !(mOutputUsage & GRALLOC_USAGE_HW_COMPOSER))) {
+#else
+             mOutputUsage != GRALLOC_USAGE_HW_COMPOSER)) {
+#endif
         // We must have just switched from GLES-only to MIXED or HWC
         // composition. Stop using the format and usage requested by the GLES
         // driver; they may be suboptimal when HWC is writing to the output
@@ -323,6 +327,7 @@ status_t VirtualDisplaySurface::dequeueBuffer(Source source,
         PixelFormat format, uint64_t usage, int* sslot, sp<Fence>* fence) {
     LOG_FATAL_IF(!mDisplayId);
 
+#ifdef QCOM_UM_FAMILY
     // Exclude video encoder usage flag from scratch buffer usage flags.
     if (source == SOURCE_SCRATCH) {
         usage |= GRALLOC_USAGE_HW_FB;
@@ -330,6 +335,7 @@ status_t VirtualDisplaySurface::dequeueBuffer(Source source,
         VDS_LOGV("dequeueBuffer(%s): updated scratch buffer usage flags=%#" PRIx64,
                 dbgSourceStr(source), usage);
     }
+#endif
 
     status_t result =
             mSource[source]->dequeueBuffer(sslot, fence, mSinkBufferWidth, mSinkBufferHeight,
