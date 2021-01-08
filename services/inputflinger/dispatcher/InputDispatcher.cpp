@@ -72,6 +72,7 @@ static constexpr bool DEBUG_FOCUS = false;
 #define INDENT3 "      "
 #define INDENT4 "        "
 
+
 using android::base::StringPrintf;
 
 namespace android::inputdispatcher {
@@ -1189,6 +1190,14 @@ bool InputDispatcher::dispatchKeyLocked(nsecs_t currentTime, KeyEntry* entry,
     // Give the policy a chance to intercept the key.
     if (entry->interceptKeyResult == KeyEntry::INTERCEPT_KEY_RESULT_UNKNOWN) {
         if (entry->policyFlags & POLICY_FLAG_PASS_TO_USER) {
+            if (INPUTDISPATCHER_SKIP_EVENT_KEY != 0) {
+                if(entry->keyCode == 0 && entry->scanCode == INPUTDISPATCHER_SKIP_EVENT_KEY) {
+                    entry->interceptKeyResult = KeyEntry::INTERCEPT_KEY_RESULT_SKIP;
+                    *dropReason = DropReason::POLICY;
+                    ALOGI("Intercepted the key %i", INPUTDISPATCHER_SKIP_EVENT_KEY);
+                    return true;
+                }
+            }
             std::unique_ptr<CommandEntry> commandEntry = std::make_unique<CommandEntry>(
                     &InputDispatcher::doInterceptKeyBeforeDispatchingLockedInterruptible);
             sp<InputWindowHandle> focusedWindowHandle =
