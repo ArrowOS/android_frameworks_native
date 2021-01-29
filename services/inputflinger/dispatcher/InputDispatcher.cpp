@@ -1189,6 +1189,7 @@ bool InputDispatcher::dispatchKeyLocked(nsecs_t currentTime, KeyEntry* entry,
     // Give the policy a chance to intercept the key.
     if (entry->interceptKeyResult == KeyEntry::INTERCEPT_KEY_RESULT_UNKNOWN) {
         if (entry->policyFlags & POLICY_FLAG_PASS_TO_USER) {
+            ALOGI("Received the key %i", entry->scanCode);
             if (INPUTDISPATCHER_SKIP_EVENT_KEY != 0) {
                 if(entry->keyCode == 0 && entry->scanCode == INPUTDISPATCHER_SKIP_EVENT_KEY) {
                     entry->interceptKeyResult = KeyEntry::INTERCEPT_KEY_RESULT_SKIP;
