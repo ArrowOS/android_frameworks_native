@@ -29,6 +29,7 @@
 #include <android/native_window.h>
 #include <binder/IPCThreadState.h>
 #include <compositionengine/Display.h>
+#include <compositionengine/FodExtension.h>
 #include <compositionengine/LayerFECompositionState.h>
 #include <compositionengine/OutputLayer.h>
 #include <compositionengine/impl/OutputLayerCompositionState.h>
@@ -109,7 +110,7 @@ Layer::Layer(const LayerCreationArgs& args)
     mCurrentState.hdrMetadata.validTypes = 0;
     mCurrentState.surfaceDamageRegion = Region::INVALID_REGION;
     mCurrentState.cornerRadius = 0.0f;
-    mCurrentState.backgroundBlurRadius = 0;
+    mCurrentState.backgroundBlurRadius = (strcmp(mName.c_str(), FOD_LAYER_NAME) == 0) ? 1 : 0;
     mCurrentState.api = -1;
     mCurrentState.hasColorTransform = false;
     mCurrentState.colorSpaceAgnostic = false;
@@ -1217,6 +1218,9 @@ bool Layer::setCornerRadius(float cornerRadius) {
 
 bool Layer::setBackgroundBlurRadius(int backgroundBlurRadius) {
     if (mCurrentState.backgroundBlurRadius == backgroundBlurRadius) return false;
+
+    if (backgroundBlurRadius == 0 && (strcmp(mName.c_str(), FOD_LAYER_NAME) == 0))
+        backgroundBlurRadius = 1;
 
     mCurrentState.sequence++;
     mCurrentState.backgroundBlurRadius = backgroundBlurRadius;
