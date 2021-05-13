@@ -220,6 +220,7 @@ public:
         half4 color;
         float cornerRadius;
         int backgroundBlurRadius;
+        bool forceBackgroundBlur;
 
         bool inputInfoChanged;
         InputWindowInfo inputInfo;
