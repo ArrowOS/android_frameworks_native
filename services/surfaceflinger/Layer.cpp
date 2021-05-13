@@ -25,10 +25,12 @@
 
 #include "Layer.h"
 
+#include <android-base/properties.h>
 #include <android-base/stringprintf.h>
 #include <android/native_window.h>
 #include <binder/IPCThreadState.h>
 #include <compositionengine/Display.h>
+#include <compositionengine/FodExtension.h>
 #include <compositionengine/LayerFECompositionState.h>
 #include <compositionengine/OutputLayer.h>
 #include <compositionengine/impl/OutputLayerCompositionState.h>
@@ -86,6 +88,9 @@ Layer::Layer(const LayerCreationArgs& args)
     if (args.flags & ISurfaceComposerClient::eOpaque) layerFlags |= layer_state_t::eLayerOpaque;
     if (args.flags & ISurfaceComposerClient::eSecure) layerFlags |= layer_state_t::eLayerSecure;
 
+    mCurrentState.forceBackgroundBlur = ((strcmp(mName.c_str(), FOD_LAYER_NAME) == 0)
+        && (strcmp(android::base::GetProperty("ro.sf.fod_layer_as_fbt", "").c_str(), "true") == 0));
+
     mCurrentState.active_legacy.w = args.w;
     mCurrentState.active_legacy.h = args.h;
     mCurrentState.flags = layerFlags;
@@ -109,7 +114,7 @@ Layer::Layer(const LayerCreationArgs& args)
     mCurrentState.hdrMetadata.validTypes = 0;
     mCurrentState.surfaceDamageRegion = Region::INVALID_REGION;
     mCurrentState.cornerRadius = 0.0f;
-    mCurrentState.backgroundBlurRadius = 0;
+    mCurrentState.backgroundBlurRadius = mCurrentState.forceBackgroundBlur ? 1 : 0;
     mCurrentState.api = -1;
     mCurrentState.hasColorTransform = false;
     mCurrentState.colorSpaceAgnostic = false;
@@ -1217,6 +1222,9 @@ bool Layer::setCornerRadius(float cornerRadius) {
 
 bool Layer::setBackgroundBlurRadius(int backgroundBlurRadius) {
     if (mCurrentState.backgroundBlurRadius == backgroundBlurRadius) return false;
+
+    if (mCurrentState.forceBackgroundBlur)
+        backgroundBlurRadius = 1;
 
     mCurrentState.sequence++;
     mCurrentState.backgroundBlurRadius = backgroundBlurRadius;
