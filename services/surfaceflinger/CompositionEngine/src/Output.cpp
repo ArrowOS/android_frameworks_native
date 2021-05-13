@@ -604,7 +604,10 @@ compositionengine::OutputLayer* Output::findLayerRequestingBackgroundComposition
     compositionengine::OutputLayer* layerRequestingBgComposition = nullptr;
     for (auto* layer : getOutputLayersOrderedByZ()) {
         if (layer->getLayerFE().getCompositionState()->backgroundBlurRadius > 0) {
-            layerRequestingBgComposition = layer;
+            if (!(layerRequestingBgComposition != nullptr
+                && layer->getLayerFE().getCompositionState()->forceBackgroundBlur)) {
+                layerRequestingBgComposition = layer;
+            }
         }
     }
     return layerRequestingBgComposition;
