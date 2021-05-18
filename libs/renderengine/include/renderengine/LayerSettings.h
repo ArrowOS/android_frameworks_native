@@ -151,6 +151,8 @@ struct LayerSettings {
     ShadowSettings shadow;
 
     int backgroundBlurRadius = 0;
+
+    bool forceBackgroundBlur = false;
 };
 
 // Keep in sync with custom comparison function in

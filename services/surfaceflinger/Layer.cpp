@@ -469,6 +469,7 @@ void Layer::prepareBasicGeometryCompositionState() {
     compositionState->blendMode = static_cast<Hwc2::IComposerClient::BlendMode>(blendMode);
     compositionState->alpha = alpha;
     compositionState->backgroundBlurRadius = drawingState.backgroundBlurRadius;
+    compositionState->forceBackgroundBlur = drawingState.forceBackgroundBlur;
 }
 
 void Layer::prepareGeometryCompositionState() {
@@ -640,6 +641,7 @@ std::optional<compositionengine::LayerFE::LayerSettings> Layer::prepareClientCom
     layerSettings.alpha = alpha;
     layerSettings.sourceDataspace = getDataSpace();
     layerSettings.backgroundBlurRadius = getBackgroundBlurRadius();
+    layerSettings.forceBackgroundBlur = getDrawingState().forceBackgroundBlur;
     return layerSettings;
 }
 
@@ -1223,7 +1225,7 @@ bool Layer::setCornerRadius(float cornerRadius) {
 bool Layer::setBackgroundBlurRadius(int backgroundBlurRadius) {
     if (mCurrentState.backgroundBlurRadius == backgroundBlurRadius) return false;
 
-    if (mCurrentState.forceBackgroundBlur)
+    if (mCurrentState.forceBackgroundBlur && backgroundBlurRadius == 0)
         backgroundBlurRadius = 1;
 
     mCurrentState.sequence++;
