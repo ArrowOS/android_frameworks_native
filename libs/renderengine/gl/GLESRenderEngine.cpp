@@ -1056,9 +1056,14 @@ status_t GLESRenderEngine::drawLayers(const DisplaySettings& display,
     // offscreen buffer, and when to render to the native buffer.
     std::deque<const LayerSettings*> blurLayers;
     if (CC_LIKELY(mBlurFilter != nullptr)) {
+        bool blurLayersFound = false;
         for (auto layer : layers) {
-            if (layer->backgroundBlurRadius > 0) {
-                blurLayers.push_back(layer);
+            if (layer->backgroundBlurRadius > 0
+                && !blurLayersFound) {
+                if (!(blurLayersFound && layer->forceBackgroundBlur)) {
+                    blurLayers.push_back(layer);
+                }
+                blurLayersFound = true;
             }
         }
     }
