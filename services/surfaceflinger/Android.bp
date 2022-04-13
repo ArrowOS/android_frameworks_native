@@ -25,8 +25,8 @@ cc_defaults {
     name: "libsurfaceflinger_defaults",
     defaults: [
         "surfaceflinger_defaults",
-        "skia_renderengine_deps",
         "surfaceflinger_qcom_ext_defaults",
+        "skia_renderengine_deps",
     ],
     cflags: [
         "-DLOG_TAG=\"SurfaceFlinger\"",

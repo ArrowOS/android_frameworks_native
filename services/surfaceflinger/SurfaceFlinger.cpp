@@ -623,9 +623,8 @@ void SurfaceFlinger::enableHalVirtualDisplays(bool enable) {
     }
 }
 
-VirtualDisplayId SurfaceFlinger::acquireVirtualDisplay(ui::Size resolution,
-                                                       ui::PixelFormat format,
-                                                       bool canAllocateHwcForVDS) {
+VirtualDisplayId SurfaceFlinger::acquireVirtualDisplay(ui::Size resolution, ui::PixelFormat format,
+						       bool canAllocateHwcForVDS) {
     auto& generator = mVirtualDisplayIdGenerators.hal;
     if (canAllocateHwcForVDS && generator) {
         if (const auto id = generator->generateId()) {
