@@ -74,6 +74,8 @@ static constexpr bool DEBUG_TOUCH_OCCLUSION = true;
 #include "Connection.h"
 #include "InputDispatcher.h"
 
+#include <dlfcn.h>
+
 #define INDENT "  "
 #define INDENT2 "    "
 #define INDENT3 "      "
@@ -135,6 +137,12 @@ constexpr size_t RECENT_QUEUE_MAX_SIZE = 10;
 // Event log tags. See EventLogTags.logtags for reference
 constexpr int LOGTAG_INPUT_INTERACTION = 62000;
 constexpr int LOGTAG_INPUT_FOCUS = 62001;
+
+#define POWERHAL_LIB_NAME "libpowerhalwrap.so"
+
+int (*powerTouchBoost)(int) = NULL;
+typedef int (*boost)(int);
+void *pwr_handle = NULL;
 
 static inline nsecs_t now() {
     return systemTime(SYSTEM_TIME_MONOTONIC);
@@ -536,6 +544,15 @@ InputDispatcher::InputDispatcher(const sp<InputDispatcherPolicyInterface>& polic
         mLatencyAggregator(),
         mLatencyTracker(&mLatencyAggregator),
         mCompatService(getCompatService()) {
+    void *func;
+    pwr_handle = dlopen(POWERHAL_LIB_NAME, RTLD_NOW);
+    if (pwr_handle != NULL) {
+        func = dlsym(pwr_handle, "PowerHal_TouchBoost");
+        powerTouchBoost = reinterpret_cast<boost>(func);
+        if (powerTouchBoost == NULL) {
+            ALOGE("PowerHal_TouchBoost init fail!");
+        }
+    }
     mLooper = new Looper(false);
     mReporter = createInputReporter();
 
@@ -972,6 +989,20 @@ bool InputDispatcher::enqueueInboundEventLocked(std::unique_ptr<EventEntry> newE
             if (shouldPruneInboundQueueLocked(static_cast<MotionEntry&>(entry))) {
                 mNextUnblockedEvent = mInboundQueue.back();
                 needWake = true;
+            }
+            MotionEntry& motionEntry = static_cast<MotionEntry&>(entry);
+            switch (motionEntry.action) {
+                case AMOTION_EVENT_ACTION_DOWN: {
+                    if (powerTouchBoost)
+                        powerTouchBoost(1); // enable boost
+                    break;
+                }
+                case AMOTION_EVENT_ACTION_UP:
+                case AMOTION_EVENT_ACTION_CANCEL: {
+                    if (powerTouchBoost)
+                        powerTouchBoost(0); // disable boost
+                    break;
+                }
             }
             break;
         }
